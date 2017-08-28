@@ -1,0 +1,8 @@
+#! /bin/bash 
+updatedb
+mkdir /cp/logs/
+VAR=$(locate directorylistbase)
+mv $VAR /cp/logs/directorylistbase
+find / \(-path /sys -o -path /run -o -path /proc \) -prune -o -print > /cp/logs/directorylist
+grep -F -x -v -f /cp/logs/directorylistbase /cp/logs/directorylist > /cp/logs/directorylistchanges
+

@@ -1,0 +1,492 @@
+#! /bin/bash
+################################################################################################
+####					                    UBUNTU 12.04			 					    ####
+####					                   	  MACHARIEL		  	                            ####
+################################################################################################
+####                            PROPERTY OF LA CUEVA CYBER PATRIOT                          ####
+####                                       & ROWAN HART                                     ####
+####                            ---------DO NOT DISTRIBUTE--------                          ####
+####                           [Except me because I made the thing]                         ####
+################################################################################################
+####					   				   PROCESS ORDER:	                                ####
+####	1. Create necessary directories.						                            ####
+####	2. Backup key files.								                                ####
+####	3. Scan system for malware or other unneccessary items/media files.		            ####
+####    4. Install firewall.								                                ####
+####	5. Change user passwords.							                                ####
+####	6. Update password and system policies.						                        ####
+####	7. Remove unwanted services and processes.					                        ####
+####	8. Install user tools for completing round manually.				                ####
+####	9. Install and configure updates.						                            ####
+################################################################################################
+
+################################################################################################
+####                                       PRE REQUISITES                                   ####
+################################################################################################
+echo "BEFORE YOU RUN THIS PROGRAM IT IS STRONGLY RECOMMENDED YOU DO THE FOLLOWING!!!!"
+echo "-CHECK THE /ETC/APT/SOURCES.LIST FILE"
+echo "-SET AUTOMATIC UPDATES THROUGH THE GUI BECAUSE CP SUCKS"
+echo "-ANSWER ANY FORENSICS QUESTIONS, ESPECIALLY ONES TO DO WITH MALWARE. WHEN READY TO CONTINUE, PRESS 1. IF YOU CHANGED YOUR MIND, PRESS 2."
+select StartOrExit in "Start" "Exit"; do
+	case $StartOrExit in
+		Start) echo "Starting"; read -p "Have you DONE GUI AUTO UPDATES? ENTER TO CONTINUE: " guiupdates; break;;
+		Exit) exit;;
+	esac
+done
+
+################################################################################################
+####                                       CREATE DIRECTORIES                               ####
+################################################################################################
+
+echo "Creating necessary directories if they do not already exist. This is automatic."
+CYBERDIRECTORY="/cp"
+mkdir /cp/ > /dev/null
+mkdir /cp/backup > /dev/null
+mkdir /cp/logs > /dev/null
+mkdir /cp/mal > /dev/null
+mkdir /cp/resources > /dev/null
+chmod -R 777 /cp/*
+chmod -R 777 /cp
+echo "Directories for Cyber Patriot routines created."
+
+################################################################################################
+####                                       BACKUP KEY FILES                                 ####
+################################################################################################
+
+echo "Would you like to back up key system files?"
+select askBackupKeySystemFiles in "Yes" "No"; do
+	case $askBackupKeySystemFiles in
+		Yes)	echo "Backing up key system files"
+					cp /etc/apt/sources.list /etc/apt/sources.list.bak
+					cp /etc/apt/sources.list /cp/backup/sources.list.bak
+					cp /etc/apt/apt.conf.d/10periodic /etc/apt/apt.conf.d/10periodic.bak
+					cp /etc/apt/apt.conf.d/10periodic /cp/backup/10periodic.bak		
+					cp /etc/apt/apt.conf.d/50unattended-upgrades /etc/apt/apt.conf.d/50unattended-upgrades.bak
+					cp /etc/apt/apt.conf.d/50unattended-upgrades /cp/backup/50unattended-upgrades.bak
+					cp /etc/apt/apt.conf.d/20auto-upgrades /etc/apt/apt.conf.d/20auto-upgrades
+					cp /etc/apt/apt.conf.d/20auto-upgrades /cp/backup/20auto-upgrades
+					cp /etc/pam.d/common-password /etc/pam.d/common-password.bak
+					cp /etc/pam.d/common-password /cp/backup/common-password.bak
+					cp /etc/pam.d/common-auth /etc/pam.d/common-auth.bak
+					cp /etc/pam.d/common-auth /cp/backup/common-auth.bak
+					cp /etc/login.defs /etc/login.defs.bak
+					cp /etc/login.defs /cp/backup/login.defs.bak
+					cp /etc/ssh/sshd_config /etc/ssh/sshd_config.bak
+					cp /etc/ssh/sshd_config /cp/backup/sshd_config.bak
+					cp -av /etc/init.d /cp/backup/init.d.bak
+					cp /etc/shadow /etc/shadow.bak
+					cp /etc/shadow /cp/backup/shadow.bak
+					cp /etc/group /etc/group.bak
+					cp /etc/group /cp/backup/group.bak
+					cp /etc/sudoers /etc/sudoers.bak
+					cp /etc/sudoers /cp/backup/sudoers.bak
+					cp /etc/sysctl.conf /etc/sysctl.conf.bak
+					cp /etc/sysctl.conf /cp/backup/sysctl.conf.bak
+					cp /etc/fstab /etc/fstab.bak
+					cp /etc/fstab /cp/backup/fstab.bak
+					cp /etc/pam.d/su /etc/pam.d/su.bak
+					cp /etc/pam.d/su /cp/backup/su.bak
+					cp /etc/passwd /etc/passwd.bak
+					cp /etc/passwd /cp/backup/passwd.bak
+					break;;
+		No ) 	echo "Not backing up key system files"; break;;
+	esac
+done
+
+################################################################################################
+####                                SYSTEM SCANS                                            ####
+################################################################################################
+
+echo "Do you want to perform system scans? This will do the following:"
+echo "-Generate a file of everything that has been changed since the last kernel update."
+echo "-Generate a file of everything that has been changed since the second to last kernel update."
+echo "-Generate a file of everything that has been changed in the last XX days, specified by the user."
+echo "-Generate a file of all media files on the system in the most common formats."
+echo "-Generate a file of everything in all users home directories."
+echo "-Generate a file containing the output of all services and packages on the system."
+echo "-Generate a file containing most potential malware on the system, located by find. THIS IS NOT A SUBSTITUTE FOR CHECKING YOURSELF!!!!!"
+echo "-Generate a file containing a list of files and directories that have 777 permissions."
+echo "-Generate a file of all users with UID 0"
+select askSystemScans in "Yes" "No"; do
+	case $askSystemScans in
+		Yes)	updatedb
+					#find / -maxdepth 100000 \( -path /sys -o -path /usr -o -path /lib -o -path /run -o -path /var/lib -o -path /proc -o -path /dev -o -path /home -o -path /var/cache \) -prune -o -print -newer /initrd.img >> /cp/logs/changessincelastkernel
+					#find / -maxdepth 100000 \( -path /sys -o -path /usr -o -path /lib -o -path /run -o -path /var/lib -o -path /proc -o -path /dev -o -path /home -o -path /var/cache \) -prune -o -print  -newer /initrd.img.old > /cp/logs/changessincesecondlastkernel
+					#echo "Specify a number of days to find files newer than?"
+					#select askSpecificDaysFile in "Yes" "No"; do
+					#	case $askSpecificDaysFile in
+					#		Yes) read -p "Input number of days: " DAYS; find / -maxdepth 10000 -atime $DAYS >> /cp/logs/changessinceuserspecified; break;;
+					#		No) break;;
+					#	esac
+					#done
+					touch /cp/logs/mediafiles
+					find / -maxdepth 100000 -iname *.mp3 -o -iname *.mp4 -o -iname *.mov -o -iname *.avi -o -iname *.mpg -o -iname *.flac -o -iname *.m4a -o -iname *.flv -o -iname *.mkv -o -iname *.ogg -o -iname *.gif -o -iname *.png -o -iname *.jpg -o -iname *.jpeg >> /cp/logs/mediafiles
+					find /home -maxdepth 10000 >> /cp/logs/homedirectoryfiles
+					sort -u /cp/logs/homedirectoryfiles > /cp/logs/homedirectoryfiles.new; rm /cp/logs/homedirectoryfiles; mv /cp/logs/homedirectoryfiles.new /cp/logs/homedirectoryfiles
+					dpkg --list >> /cp/logs/packageslist
+					dpkg --list | egrep 'downloader|mp3|music|video|torrent|media|cleaner|driver|crack|password|dictionary|table|server|listener|logger|key|keylogger|sniffer|ripper|hash|remote|viewer|rootkit|login|ftp|rainbow|hack|worm|trojan|' >> /cp/logs/possiblebadpackages
+					sort -u /cp/logs/packageslist > /cp/logs/packageslist.new; rm /cp/logs/packageslist; mv /cp/logs/packageslist.new /cp/logs/packageslist
+					sort -u /cp/logs/possiblebadpackages > /cp/logs/possiblebadpackages.new; rm /cp/logs/possiblebadpackages; mv /cp/logs/possiblebadpackages.new /cp/logs/possiblebadpackages
+					find /usr/opt >> /cp/logs/userinstalledfiles
+					find /usr/bin >> /cp/logs/userinstalledfiles
+					find /usr/lib >> /cp/logs/userinstalledfiles
+					find /usr/sbin >> /cp/logs/userinstalledfiles
+					find /usr/local/bin >> /cp/logs/userinstalledfiles
+					find /usr/share >> /cp/logs/userinstalledfiles
+					sort -u /cp/logs/userinstalledfiles > /cp/logs/userinstalledfiles.new; rm /cp/logs/userinstalledfiles; mv /cp/logs/userinstalledfiles.new /cp/logs/userinstalledfiles
+					find / -maxdepth 100000 -iname "vnc" -o  -iname "xtightvnc" -o -iname "nc" -o -iname "nc.traditional" -o -iname "netcat" -o -iname "smbd" -o -iname "samba" -o -iname "minerd" -o -iname "nginx" -o -iname "john" -o -iname "X11vnc" -o -iname "Vnc4server" -o -iname "ssvnc" -o -iname "Samba-server" -o -iname "Samba-dev" -o -iname "Samba-common" -o -iname "Samba-vfs-modules" -o -iname "Netcat-traditional" -o -iname "Bind9" -o -iname "Nginx-light" -o -iname "Nginx-naxsi" -o -iname "john" -o -iname "nmap" -o -iname "aircrack-ng" -o -iname "openvas-server" -o -iname "wireshark" -o -iname "wireshark-common" -o -iname "wireshark-dev" -o -iname "tshark" -o -iname "ulogd2-pcap" -o -iname "snort" -o -iname "snort-common" -o -iname "tcpspy" -o -iname "netmate" -o -iname "reaver" -o -iname "wifite" -o -iname "nfs" -o -iname "rpc" -o -iname "oftc-hybrd" -o -iname "ircd-ratbox" -o -iname "ircd-ircu" -o -iname "ircd-hybrid" -o -iname "insiprcd" -o -iname "hydra" -o -iname "dns" -o -iname "ftp" -o -iname "metasploit" -o -iname "beef-xss" -o -iname "ettercap" > /cp/logs/potentialfoundbadservices;
+					cd / && ls -laR 2> /dev/null | grep rwxrwxrwx | grep -v "lrwx" &> /cp/logs/badpermissionfiles
+					sort -u /cp/logs/badpermissionfiles >> /cp/logs/badpermissionfiles.new; rm /cp/logs/badpermissionfiles; mv /cp/logs/badpermissionfiles.new /cp/logs/badpermissionfiles
+					cut -d: -f1,3 /etc/passwd | egrep ':0$' | cut -d: -f1 | grep -v root >> /cp/logs/zeroidusers; break;;
+					awk -F: '($2 == "") {print}' /etc/shadow >> /cp/logs/emptypasswordaccounts
+					awk -F: '($3 == "0") {print}' /etc/passwd >> /cp/logs/zeroidusers
+					netstat -tulpn >> /cp/logs/listeningports
+					nmap -sT -O localhost >> /cp/logs/listeningports
+					find / \( -perm -4000 -o -perm -2000 \) -print >> /cp/logs/suidproblemfiles
+					find / -path -prune -o -type f -perm +6000 -ls >> /cp/logs/problemfiles
+					find /dir -xdev -type d \( -perm -0002 -a ! -perm -1000 \) -print >> /cp/logs/worldwritablefiles
+					find /dir -xdev \( -nouser -o -nogroup \) -print
+					#apt-get install logwatch && apt-get install logcheck
+					#rndc querylog
+					echo -e "Query logs enabled"
+					echo -e "IMPORTANT: IF THERE IS A SERVER ON THE SYSTEM, BE IT SSH, SFTP, SQL, WHATEVER, YOU NEED TO GOOGLE HOW TO TURN ON LOGGING AND DO SO."
+					
+		No )	echo "Not scanning"; break;;
+	esac
+done
+echo "Scan for startup scripts with crontab?"
+select askScanCrontab in "Yes" "No"; do
+	case $askScanCrontab in
+		Yes)	updatedb
+					SAPHARIEL=$(locate "saphariel")
+					mv $SAPHARIEL /cp/scripts/saphariel
+					chmod +x /cp/scripts/saphariel
+					cd /cp/scripts
+					./saphariel
+					./saphariel >> /cp/logs/crontabitems; cat crontabitems
+					break;;
+		No )	break;;
+	esac
+done
+echo "Edit crontab?"
+select askEditCrontab in "Yes" "No"; do
+	case $askEditCrontab in
+		Yes)	crontab -e; break;;
+		No )	break;;
+	esac
+done
+################################################################################################
+####                                  FIREWALL	                                            ####
+################################################################################################
+
+echo "Install Firewall?"
+select askFirewall in "Yes" "No"; do
+	case $askFirewall in
+		Yes) 	apt-get install ufw -y; break;;
+		No )	break;;
+	esac
+done
+echo "Configure Firewall?"
+select askConfigFirewall in "Yes" "No"; do
+    case $askConfigFirewall in
+        Yes)	ufw enable; ufw default deny; ufw allow 80; ufw allow 22; break;;
+		No ) 	break;;
+    esac
+done
+
+################################################################################################
+####                                     PASSWORDS                                          ####
+################################################################################################
+
+echo "Change passwords?"
+select askChangePasswords in "Yes" "No"; do
+    case $askChangePasswords in
+		Yes)    echo "Changing Root Password"
+			echo "All users listed below"
+			awk -F ':' '{ print $1}' /etc/shadow
+			echo "root:JohnIsAMonster6969!" | chpasswd
+                	passwd -l root
+			read -p "Usernames, separated by spaces: " USERS
+                        for word in $USERS; do
+                            echo $word":JohnIsAMonster6969!" | chpasswd
+                        done; break;;
+		No ) 	echo "Not changing passwords."; break;;
+	esac
+done
+
+################################################################################################
+####                                     POLICIES                                           ####
+################################################################################################
+
+echo "Install Libpam-Cracklib?"
+select askInstallLibpam in "Yes" "No"; do 
+    case $askInstallLibpam in
+        Yes) 	apt-get install libpam-cracklib -y; tac /cp/logs/ifBackedUp; break;;
+        No ) 	break;;
+	esac
+done
+echo "Update Common-Password?"
+select askUpdateCommonPass in "Yes" "No"; do
+	case $askUpdateCommonPass in
+		Yes) 	echo -e "password	requisite  pam_cracklib.so retry=3 minlen=12 difok=3 reject_username minclass=3 maxrepeat=2 dcredit=2 ucredit=1 lcredit=1 ocredit=1 \npassword  requisite   pam_pwhistory.so    use_authtok  remember=5   enforce_for_root \npassword	[success=1 default=ignore]	pam_unix.so obscure use_authtok try_first_pass sha512 shadow \npassword requisite pam_deny.so \npassword required pam_permit.so \npassword optional pam_gnome_keyring.so" > /etc/pam.d/common-password; break;;
+		No ) 	break;;
+	esac
+done
+echo "Update System-Auth?"
+select askUpdateSystemAuth in "Yes" "No"; do
+	case $askUpdateSystemAuth in
+		Yes)	echo -e "password	required	pam_cracklib.so retry=3 minlen=14 difok=6" >> /etc/pam.d/system-auth; break;;
+		No) 	echo -e break;;
+	esac
+done
+echo "Update Common-Auth?"
+select askUpdateCommonAuth in "Yes" "No"; do
+    case $askUpdateCommonAuth in
+        Yes) 	echo -e "auth required pam_tally2.so deny=5 unlock_time=900 onerr=fail audit even_deny_root_account silent \nauth	[success=1 default=ignore]	pam_unix.so nullok_secure \nauth requisite pam_deny.so \nauth required pam_permit.so \nauth optional pam_cap.so" > /etc/pam.d/common-auth; touch /etc/security/opasswd; chmod 644 /etc/security/opasswd; break;;
+        No ) 	break;;
+    esac
+done
+echo "Update System-Auth?"
+select askUpdateSystemAuth in "Yes" "No"; do
+	case $askUpdateSystemAuth in		
+		Yes) 	echo -e "auth required /lib/security/$ISA/pam_tally.so onerr=fail no_magic_root \naccount required /lib/security/$ISA/pam_tally.so per_user deny=5 no_magic_root reset" >> /etc/pam.d/system-auth; break;;
+		No ) 	break;;
+	esac
+done
+echo "Update Login Defs?"
+select askLoginDefs in "Yes" "No"; do
+    case $askLoginDefs in
+		Yes)	echo -e "MAIL_DIR /var/mail \nFAILLOG_ENAB yes \nLOG_UNKFAIL_ENAB no \nLOG_OK_LOGINS yes \nSYSLOG_SU_ENAB yes \nSYSLOG_SG_ENAB yes \nSULOG_FILE /var/log/sulog \nFTMP_FILE /var/log/btmp \nSU_NAME su \nHUSHLOGIN_FILE .hushlogin \nENV_SUPATH PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr \nbin:/sbin:/bin \nENV_PATH PATH=/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games \nTTYGROUP tty \nTTYPERM 0600 \nERASECHAR 0177 \nKILLCHAR 025 \nUMASK 022 \nPASS_MAX_DAYS 30 \nPASS_MIN_DAYS 14 \nPASS_WARN_AGE 7 \nUID_MIN 1000 \nUID_MAX 60000 \nGID_MIN 1000 \nGID_MAX 60000 \nLOGIN_RETRIES 3 \nLOGIN_TIMEOUT 60 \nCHFN_RESTRICT rwh \nDEFAULT_HOME no \nUSERGROUPS_ENAB yes" > /etc/login.defs; break;;
+		No ) 	break;;
+    esac
+done
+echo "Update SSH config?"
+select askUpdateSSHConfig in "Yes" "No"; do
+	case $askUpdateSSHConfig in
+		Yes) 	echo -e "Port 22 \nProtocol 2 \nHostKey /etc/ssh/ssh_host_rsa_key \nHostKey /etc/ssh \nssh_host_dsa_key \nHostKey /etc/ssh/ssh_host_ecdsa_key \nUsePrivilegeSeparation yes \nKeyRegenerationInterval 3600 \nServerKeyBits 768 \nSyslogFacility AUTH \nLogLevel INFO \nLoginGraceTime 60 \nPermitRootLogin no \nStrictModes yes \nRSAAuthentication yes \nPubkeyAuthentication yes \nIgnoreRhosts yes \nRhostsRSAAuthentication no \nHostbasedAuthentication no \nPermitEmptyPasswords no \nChallengeResponseAuthentication no \nPasswordAuthentication yes \nX11Forwarding no \nX11DisplayOffset 10 \nPrintMotd no \nPrintLastLog yes \nTCPKeepAlive yes \nAcceptEnv LANG LC_* \nSubsystem sftp /usr/lib/openssh/sftp-server \nUsePAM yes" > /etc/ssh/sshd_config; echo "Updated"; break;;
+		No ) 	echo "SSH not updated"; break;;
+	esac
+done
+echo "Disable Guest?"
+select askDisableGuest in "Yes" "No"; do
+	case $askDisableGuest in
+		Yes) 	echo -e "\nallow-guest=false" >> /etc/lightdm/lightdm.conf; break;;
+		No ) 	break;;
+	esac
+done
+echo "Harden Kernel?"
+select askHardenKernel in "Yes" "No"; do
+	case $askHardenKernel in
+		Yes) 	echo -e "kernel.kptr_restrict=2" > /etc/sysctl.d/10-kernel-hardening.conf; break;;
+		No ) 	break;;
+	esac
+done
+echo "Harden System Control?"
+select askHardenSystemControl in "Yes" "No"; do
+	case $askHardenSystemControl in 
+		Yes) 	echo -e "net.ipv4.conf.default.rp_filter=1\nnet.ipv4.conf.all.rp_filter=1\nnet.ipv4.tcp_syncookies=1\nnet.ipv4.conf.all.accept_redirects=0\nnet.ipv6.conf.all.accept_redirects=0\nnet.ipv4.conf.all.send_redirects=0\nnet.ipv4.conf.all.accept_source_route=0\nnet.ipv6.conf.all.accept_source_route=0\nnet.ipv4.conf.all.log_martians=1" > /etc/sysctl.conf; break;;
+		No ) 	break;;
+	esac
+done
+echo "Harden FSTAB?"
+select askHardenFstab in "Yes" "No"; do
+	case $askHardenFstab in
+		Yes) 	echo -e "tmpfs     /dev/shm     tmpfs     defaults,noexec,nosuid     0     0" >> /etc/fstab; break;;
+		No ) 	break;;
+	esac
+done
+echo "Fix Permissions?"
+select askFixPermissions in "Yes" "No"; do	
+	case $askFixPermissions in	
+		Yes) 	chmod -R 755 /bin/; chmod 744 /etc/shadow; chown -R root:root /bin/; break;;
+		No ) 	break;;
+	esac
+done
+echo "Disable ipv6?"
+select askDisableIpv6 in "Yes" "No"; do
+	case $askDisableIpv6 in
+		Yes)	sed -i "s/alias net-pf-10 ipv6/alias net-pf-10 off\nalias ipv6 off/" /etc/modprobe.d/aliases; break;;
+		No) 	break;;
+	esac
+done
+echo "Enable security audits?"
+select askEnableSecurityAudits in "Yes" "No"; do
+	case $askEnableSecurityAudits in
+		Yes) 	apt-get install yum
+			apt-get install audit
+			yum install audit
+			/etc/init.d/auditd start
+			auditctl -w /etc/shadow -k shadow-file -p rwxa
+			auditctl -w /tmp -p e -k webserver0watch-tmp
+			auditctl -w /etc/group -k group-file -p rxwa
+			
+		No)	break;;
+	esac
+done
+############################################################################################################################
+####				Some end-of-unit stuff that doesn't fit into a category.				####
+############################################################################################################################
+
+echo "List of files to manually check outputted to /cp/logs/checkthesemanually. Make sure to use VISUDO and verify settings! No NOPASSWD users!"
+echo "Do you want to set the final settings for autologin, guest, and some other stuff?"
+select askFinalSettings in "Yes" "No"; do
+	case $askFinalSettings in
+		Yes)	touch /cp/logs/checkthesemanually
+					echo -e "/etc/resolv.conf \n /etc/hosts \n /etc/rc.local" > /cp/logs/checkthesemanually
+					cat /etc/resolv.conf >> /cp/logs/checkthisfile; cat /etc/hosts >> /cp/logs/checkthisfile; cat /etc/rc.local >> /cp/logs/checkthisfile;
+					echo -e "[SeatDefaults] \nallow-guest=false \ngreeter-hide-user=true \ngreeter-show-manual-login=true" > /etc/lightdm/lightdm.conf
+					cd /etc/
+					cd /etc/
+					/bin/rm -f cron.deny at.deny
+					echo root > cron.allow
+					echo root > at.allow
+					/bin/chown root:root cron.allow at.allow
+					/bin/chmod 400 cron.allow at.allow
+					break;;
+		No ) 	break;;
+	esac
+done
+############################################################################################################################
+####                            			MALWARE				                                ####
+############################################################################################################################
+
+echo "Install antivirus?"
+select askInstallAntivirus in "Yes" "No"; do
+    case $askInstallAntivirus in
+        Yes)	apt-get install rkhunter -y; break;;
+        No )	break;;
+    esac
+done
+echo "Run RKHunter Checks?"
+select askRunRKHunter in "Yes" "No"; do
+    case $askRunRKHunter in
+		Yes)	rkhunter --update; rkhunter -c --enable all --disable none --cronjob; break;;
+        No )	break;;
+    esac
+done
+echo "Remove bad/vulnerable programs?"
+select askRemoveBad in "Yes" "No"; do
+    case $askRemoveBad in
+        Yes)	apt-get install htop --force-yes;
+                    apt-get install chkconfig --force-yes;
+                    apt-get purge inted --force-yes;
+                    apt-get purge xinetd --force-yes;
+					apt-get purge ypserv --force-yes;
+					apt-get purge tftp-server --force-yes;
+					apt-get purge telnet-server --force-yes;
+					apt-get purge rsh-serve --force-yes;
+					apt-get purge vsftpd --force-yes;
+					apt-get purge rexec --force-yes;
+					apt-get purge rlogin --force-yes;
+					apt-get purge rsh --force-yes;
+					apt-get purge rstatd --force-yes;
+					apt-get purge finger --force-yes;
+					apt-get purge talk --force-yes;
+					apt-get purge ntalk --force-yes;
+					apt-get purge ftp --force-yes;
+					apt-get purge nfs-kernelserver --force-yes;
+					apt-get purge vnc --force-yes;
+					apt-get purge xtightvnc --force-yes;
+					apt-get purge nc --force-yes;
+					apt-get purge nc.traditional --force-yes;
+					apt-get purge netcat --force-yes;
+					apt-get purge smbd --force-yes;
+					apt-get purge samba --force-yes;
+					apt-get purge bind9 --force-yes;
+					apt-get purge minerd --force-yes;
+					apt-get purge nginx --force-yes;
+					apt-get purge john* --force-yes;
+					apt-get purge X11vnc --force-yes;
+					apt-get purge vnc4server --force-yes;
+					apt-get purge ssvnc --force-yes;
+					apt-get purge samba-server --force-yes;
+					apt-get purge samba-dev --force-yes;
+					apt-get purge samba-common --force-yes;
+					apt-get purge samba-vfs-modules --force-yes;
+					apt-get purge netcat-traditional --force-yes;
+					apt-get purge bind9-host --force-yes;
+					apt-get purge bind9utils --force-yes;
+					apt-get purge nginx-light --force-yes;
+					apt-get purge nginx-naxsi --force-yes;
+					apt-get purge oftc-hybrid --force-yes;
+					apt-get purge ircd-ratbox --force-yes;
+					apt-get purge irc --force-yes;
+					rm -r /bin/nc --force-yes;
+					rm -r /bin/nc.openbsd --force-yes;
+					rm /bin/nc.traditional;
+					rm /bin/netcat;
+					rm /bin/nc;
+					echo "Delete apache?"
+					select askDeleteApache in "Yes" "No"; do 
+						case $askDeleteApache in
+							Yes)	apt-get purge apache* apache2*; break;;
+							No ) 	break;;
+						esac
+					done
+					break;;
+        No )	echo "Not getting rid of bad programs"; break;;
+    esac
+done
+
+############################################################################################################################
+####                                                    USER TOOLS                                                      ####
+############################################################################################################################
+echo "Install analysis tool suite?"
+select askInstallAnalysisTools in "Yes" "No"; do
+	case $askInstallAnalysisTools in
+		Yes)	apt-get install htop
+		        apt-get install lynis
+		        apt-get install sysv-rc-conf
+		        apt-get install apparmor
+		        apt-get install apparmor-profiles
+		        apt-get install apparmor-utils
+		        aa-complain /usr/bin/*
+		        apparmor_status
+		        read -p "Any other programs to install, separated by spaces" programsToInstall
+		        for word in $programsToInstall; do
+		            apt-get install $word
+		        done
+		        break;;
+		No ) 	break;;
+	esac
+done
+
+
+############################################################################################################################
+####                                                    UPDATES                                                         ####
+############################################################################################################################
+echo "Install unattended-upgrades and configure?"
+echo "Install Configure Unattended-Upgrades?"
+select askUnattended in "Yes" "No"; do
+    case $askUnattended in
+        Yes)	apt-get install unattended-upgrades; dpkg-reconfigure unattended-upgrades; 
+					echo -e "APT::Periodic::Update-Package-Lists \"1\";\nAPT::Periodic::Download-Upgradeable-Packages \"1\";\nAPT::Periodic::AutocleanInterval\"7\";\nAPT::Periodic::Unattended-Upgrade\"1\";\nAPT::Periodic::RandomSleep\"1\";" > /etc/apt/apt.conf.d/10periodic; echo -e "APT::Periodic::Update-Package-Lists \"1\";\nAPT::Periodic::Download-Upgradeable-Packages \"1\";\nAPT::Periodic::AutocleanInterval\"7\";\nAPT::Periodic::Unattended-Upgrade\"1\";\nAPT::Periodic::RandomSleep\"1\";" > /etc/apt/apt.conf.d/20auto-upgrades; echo -e "Unattended-Upgrade::Allowed-Origins {\n	\"\${distro_id}:\${distro_codename}\";\n	\"\${distro_id}:\${distro_codename}-security\";\n	\"\${distro_id}:\${distro_codename}-updates\";\n	\"\${distro_id}:\${distro_codename}-proposed\";\n};\nUnattended-Upgrade::Package-Blacklist {\n};\nUnattended-Upgrade::AutoFixInterruptedDpkg \"false\";\nUnattended-Upgrade::Automatic-Reboot \"true\";\nUnattended-Upgrade::Automatic-Reboot-Time \"03:30\";" > /etc/apt/apt.conf.d/50unattended-upgrades; break;;
+        No )	break;;
+    esac
+done
+echo "Which version of Ubuntu are you on? If you do not wish to update the sources.list, select \"nopatch\""
+select askUbuntuVersion in "Precise" "Trusty" "Xenial" "Debian" "nopatch"; do
+	case $askUbuntuVersion in
+		Precise )	echo -e "deb http://us.archive.ubuntu.com/ubuntu/ precise main restricted universe\ndeb-src http://us.archive.ubuntu.com/ubuntu/ precise main restricted universe multiverse\ndeb http://us.archive.ubuntu.com/ubuntu/ precise-security main restricted universe\ndeb http://us.archive.ubuntu.com/ubuntu/ precise-updates main restricted universe\ndeb http://us.archive.ubuntu.com/ubuntu/ precise-proposed main restricted universe\ndeb-src http://us.archive.ubuntu.com/ubuntu/ precise-security main restricted universe multiverse\ndeb-src http://us.archive.ubuntu.com/ubuntu/ precise-updates main restricted universe multiverse\ndeb-src http://us.archive.ubuntu.com/ubuntu/ precise-proposed main restricted universe multiverse\ndeb-src http://us.archive.ubuntu.com/ubuntu/ precise-backports main restricted universe multiverse" > /etc/apt/sources.list; break;;
+		Trusty  ) 	echo -e "deb http://us.archive.ubuntu.com/ubuntu/ trusty main restricted universe\ndeb-src http://us.archive.ubuntu.com/ubuntu/ trusty main restricted universe multiverse\ndeb http://us.archive.ubuntu.com/ubuntu/ trusty-security main restricted universe\ndeb http://us.archive.ubuntu.com/ubuntu/ trusty-updates main restricted universe\ndeb http://us.archive.ubuntu.com/ubuntu/ trusty-proposed main restricted universe\ndeb-src http://us.archive.ubuntu.com/ubuntu/ trusty-security main restricted universe multiverse\ndeb-src http://us.archive.ubuntu.com/ubuntu/ trusty-updates main restricted universe multiverse\ndeb-src http://us.archive.ubuntu.com/ubuntu/ trusty-proposed main restricted universe multiverse\ndeb-src http://us.archive.ubuntu.com/ubuntu/ trusty-backports main restricted universe multiverse" > /etc/apt/sources.list; break;;
+		Xenial  ) 	echo -e "deb http://us.archive.ubuntu.com/ubuntu/ xenial main restricted universe\ndeb-src http://us.archive.ubuntu.com/ubuntu/ xenial main restricted universe multiverse\ndeb http://us.archive.ubuntu.com/ubuntu/ xenial-security main restricted universe\ndeb http://us.archive.ubuntu.com/ubuntu/ xenial-updates main restricted universe\ndeb http://us.archive.ubuntu.com/ubuntu/ xenial-proposed main restricted universe\ndeb-src http://us.archive.ubuntu.com/ubuntu/ xenial-security main restricted universe multiverse\ndeb-src http://us.archive.ubuntu.com/ubuntu/ xenial-updates main restricted universe multiverse\ndeb-src http://us.archive.ubuntu.com/ubuntu/ xenial-proposed main restricted universe multiverse\ndeb-src http://us.archive.ubuntu.com/ubuntu/ xenial-backports main restricted universe multiverse " > /etc/apt/sources.list; break;;
+		Debian  )   echo -e "deb http://ftp.us.debian.org/debian/ jessie main contrib non-free\ndeb-src http://ftp.us.debian.org/debian/ jessie main contrib non-free\ndeb http://security.debian.org/ jessie/updates main contrib non-free\ndeb http://ftp.us.debian.org/debian/ jessie-proposed-updates main contrib non-free\ndeb-src http://security.debian.org/ jessie/updates main contrib non-free\ndeb-src http://ftp.us.debian.org/debian/ jessie-proposed-updates main contrib non-free" > /etc/apt/sources.list; break;;
+		nopatch ) 	echo -e "Not updating sources.list"; break;;
+	esac
+done
+echo "Download/install updates?"
+select askUpdate in "Yes" "No"; do
+	case $askUpdate in
+		Yes) 	read -p "Press Enter to Continue. You should have edited the sources.list already with the above. If not, do so now. " continuego
+		        apt-get update
+		        read -p "Type critical service names, separated by spaces: " criticalServices
+		        for word in $criticalServices; do
+		            apt-get install $word
+		        done
+		        apt-get dist-upgrade
+		        apt-get autoremove
+		        break;;  
+		No ) 	break;;
+	esac
+done
+

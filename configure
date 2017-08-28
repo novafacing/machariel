@@ -1,0 +1,17 @@
+#! /bin/bash
+
+echo "Setting up security scripts in proper locations."
+mkdir /cp/
+chmod 777 /cp/
+mkdir /cp/scripts
+chmod 777 /cp/scripts
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pw
+cp "$DIRmachariel" /cp/scripts/machariel
+cp "$DIRsaphariel" /cp/scripts/saphariel
+chmod -R 777 /cp/scripts/
+chmod +x /cp/scripts/machariel
+chmod +x /cp/scripts/saphariel
+echo "Press any key to run Machariel."
+read -p "ENTER: " startMachariel
+cd /cp/scripts/
+./machariel
