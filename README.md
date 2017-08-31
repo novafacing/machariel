@@ -1,15 +1,7 @@
                                        
-################################################################################################
-####                            PROPERTY OF LA CUEVA HS                                     
+################################################################################################                                   
 ####
-####                                       & ROWAN HART                                     
-####
-####                            ---------DO NOT DISTRIBUTE--------                          
-####
-####                           [Except me because I made the thing]                         
-####
-################################################################################################
-
+####            ROWAN HART [novafacing]
 Licensed under GNU Public License Version 3.0
 This script package was put together by Rowan Hart for the purpose of 
 competition.
