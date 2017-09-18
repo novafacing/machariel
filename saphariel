@@ -1,15 +1,12 @@
 #!/bin/bash
 
-# System-wide crontab file and cron job directory. Change these for your system.
+#if there are errors, check that these directories are correct.
 CRONTAB='/etc/crontab'
 CRONDIR='/etc/cron.d'
 
-# Single tab character. Annoyingly necessary.
 tab=$(echo -en "\t")
 
-# Given a stream of crontab lines, exclude non-cron job lines, replace
-# whitespace characters with a single space, and remove any spaces from the
-# beginning of each line.
+#Remove non-cron lines, remove whitespace, make readable.
 function clean_cron_lines() {
     while read line ; do
         echo "${line}" |
@@ -45,7 +42,7 @@ function lookup_run_parts() {
 temp=$(mktemp) || exit 1
 
 # Add all of the jobs from the system-wide crontab file.
-cat "${CRONTAB}" | clean_cron_lines | lookup_run_parts >"${temp}" 
+cat "${CRONTAB}" | clean_cron_lines | lookup_run_parts >"${temp}"
 
 # Add all of the jobs from the system-wide cron directory.
 cat "${CRONDIR}"/* | clean_cron_lines >>"${temp}"  # */ <not a comment>
